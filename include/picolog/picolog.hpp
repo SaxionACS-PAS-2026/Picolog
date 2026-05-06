@@ -35,6 +35,12 @@
 #ifndef INCLUDED_PICOLOG_PICOLOG_HPP
 #define INCLUDED_PICOLOG_PICOLOG_HPP
 
+// The line below disables clang-tidy checks for this file
+// NOLINTBEGIN
+
+// This line disables specific cppcheck warnings for this file
+// cppcheck-suppress-begin [functionStatic, useStlAlgorithm, uninitMemberVar]
+
 #include <string_view>
 #include <cstdio>
 #include <cstdint>
@@ -71,9 +77,9 @@ namespace picolog
             enum  struct print_flag_t : unsigned char
             {
                 none = 0u,
-                ts = 1u << 0,
-                loc = 1u << 1,
-                fun = 1u << 2,
+                ts = 1u << 0u,
+                loc = 1u << 1u,
+                fun = 1u << 2u,
                 ts_loc = ts | loc,
                 ts_fun = ts | fun,
                 loc_fun = loc | fun,
@@ -157,6 +163,7 @@ namespace picolog
                     bool print_function = true;
                 };
 
+                [[nodiscard]]
                 print_cfg_t print_cfg_func() const 
                 { 
                     return 
@@ -167,6 +174,7 @@ namespace picolog
                     };
                 }
                 
+                [[nodiscard]]
                 print_cfg_t print_cfg_vars() const 
                 { 
                     return 
@@ -180,20 +188,23 @@ namespace picolog
                 void set_print_cfg_func(const print_cfg_t& cfg) 
                 { 
                     print_flags_func_ = print_flag_t::none;
-                    if (cfg.print_timestamp) print_flags_func_ |= print_flag_t::ts;
-                    if (cfg.print_location) print_flags_func_ |= print_flag_t::loc;
-                    if (cfg.print_function) print_flags_func_ |= print_flag_t::fun;
+                    if (cfg.print_timestamp) { print_flags_func_ |= print_flag_t::ts; }
+                    if (cfg.print_location)  { print_flags_func_ |= print_flag_t::loc; }
+                    if (cfg.print_function)  { print_flags_func_ |= print_flag_t::fun; }
                 }
                 
                 void set_print_cfg_vars(const print_cfg_t& cfg) 
                 { 
                     print_flags_vars_ = print_flag_t::none;
-                    if (cfg.print_timestamp) print_flags_vars_ |= print_flag_t::ts;
-                    if (cfg.print_location) print_flags_vars_ |= print_flag_t::loc;
-                    if (cfg.print_function) print_flags_vars_ |= print_flag_t::fun;
+                    if (cfg.print_timestamp) { print_flags_vars_ |= print_flag_t::ts; }
+                    if (cfg.print_location)  { print_flags_vars_ |= print_flag_t::loc; }
+                    if (cfg.print_function)  { print_flags_vars_ |= print_flag_t::fun; }
                 }
 
+                [[nodiscard]]
                 print_flag_t print_flags_func() const { return print_flags_func_; }
+                
+                [[nodiscard]]
                 print_flag_t print_flags_vars() const { return print_flags_vars_; }
 
             private:
@@ -202,7 +213,7 @@ namespace picolog
 
                 bool short_source_paths_ = false;
                 std::FILE* output_stream_ = stdout;
-                std::string_view source_root_ = "";
+                std::string_view source_root_{};
                 std::size_t max_array_elements_ = 10;
             } config;
 
@@ -226,41 +237,41 @@ namespace picolog
         template <typename T, typename U = std::remove_cvref_t<T>>
         consteval const char * format_for_var()
         {
-            if constexpr (std::is_same_v<U, bool>) return "  %s: %s\n";
-            else if constexpr (std::is_same_v<U, char>) return "  %s: '%c'\n";
-            else if constexpr (std::is_same_v<U, signed char>) return "  %s: %hhd\n";
-            else if constexpr (std::is_same_v<U, unsigned char>) return "  %s: %hhu\n";
-            else if constexpr (std::is_same_v<U, int>) return "  %s: %d\n";
-            else if constexpr (std::is_same_v<U, long>) return "  %s: %ld\n";
-            else if constexpr (std::is_same_v<U, long long>) return "  %s: %lld\n";
-            else if constexpr (std::is_same_v<U, unsigned int>) return "  %s: %u\n";
-            else if constexpr (std::is_same_v<U, unsigned long>) return "  %s: %lu\n";
-            else if constexpr (std::is_same_v<U, unsigned long long>) return "  %s: %llu\n";
-            else if constexpr (std::is_same_v<U, float>) return "  %s: %f\n";
-            else if constexpr (std::is_same_v<U, double>) return "  %s: %lf\n";
-            else if constexpr (std::is_same_v<U, const char*>) return "  %s: \"%s\"\n";
-            else if constexpr (std::is_same_v<U, std::string_view>) return "  %s: \"%s\"\n";
-            else return "  %s: %p\n"; // fallback for pointers and other types
+            if constexpr (std::is_same_v<U, bool>)                          { return "  %s: %s\n"; }
+            else if constexpr (std::is_same_v<U, char>)                     { return "  %s: '%c'\n"; }
+            else if constexpr (std::is_same_v<U, signed char>)              { return "  %s: %hhd\n"; }
+            else if constexpr (std::is_same_v<U, unsigned char>)            { return "  %s: %hhu\n"; }
+            else if constexpr (std::is_same_v<U, int>)                      { return "  %s: %d\n"; }
+            else if constexpr (std::is_same_v<U, long>)                     { return "  %s: %ld\n"; }
+            else if constexpr (std::is_same_v<U, long long>)                { return "  %s: %lld\n"; }
+            else if constexpr (std::is_same_v<U, unsigned int>)             { return "  %s: %u\n"; }
+            else if constexpr (std::is_same_v<U, unsigned long>)            { return "  %s: %lu\n"; }
+            else if constexpr (std::is_same_v<U, unsigned long long>)       { return "  %s: %llu\n"; }
+            else if constexpr (std::is_same_v<U, float>)                    { return "  %s: %f\n"; }
+            else if constexpr (std::is_same_v<U, double>)                   { return "  %s: %lf\n"; }
+            else if constexpr (std::is_same_v<U, const char*>)              { return "  %s: \"%s\"\n"; }
+            else if constexpr (std::is_same_v<U, std::string_view>)         { return "  %s: \"%s\"\n"; }
+            else                                                            { return "  %s: %p\n"; } // fallback for pointers and other types
         }
 
         template <typename T, typename U = std::remove_cvref_t<T>>
         consteval const char * format_for_type()
         {
-            if constexpr (std::is_same_v<U, bool>) return "%s";
-            else if constexpr (std::is_same_v<U, char>) return "'%c'";
-            else if constexpr (std::is_same_v<U, signed char>) return "%hhd";
-            else if constexpr (std::is_same_v<U, unsigned char>) return "%hhu";
-            else if constexpr (std::is_same_v<U, int>) return "%d";
-            else if constexpr (std::is_same_v<U, long>) return "%ld";
-            else if constexpr (std::is_same_v<U, long long>) return "%lld";
-            else if constexpr (std::is_same_v<U, unsigned int>) return "%u";
-            else if constexpr (std::is_same_v<U, unsigned long>) return "%lu";
-            else if constexpr (std::is_same_v<U, unsigned long long>) return "%llu";
-            else if constexpr (std::is_same_v<U, float>) return "%f";
-            else if constexpr (std::is_same_v<U, double>) return "%lf";
-            else if constexpr (std::is_same_v<U, const char*>) return "\"%s\"";
-            else if constexpr (std::is_same_v<U, std::string_view>) return "\"%s\"";
-            else return "%p";
+            if constexpr (std::is_same_v<U, bool>)                      { return "%s"; }
+            else if constexpr (std::is_same_v<U, char>)                 { return "'%c'"; }
+            else if constexpr (std::is_same_v<U, signed char>)          { return "%hhd"; }
+            else if constexpr (std::is_same_v<U, unsigned char>)        { return "%hhu"; }
+            else if constexpr (std::is_same_v<U, int>)                  { return "%d"; }
+            else if constexpr (std::is_same_v<U, long>)                 { return "%ld"; }
+            else if constexpr (std::is_same_v<U, long long>)            { return "%lld"; }
+            else if constexpr (std::is_same_v<U, unsigned int>)         { return "%u"; }
+            else if constexpr (std::is_same_v<U, unsigned long>)        { return "%lu"; }
+            else if constexpr (std::is_same_v<U, unsigned long long>)   { return "%llu"; }
+            else if constexpr (std::is_same_v<U, float>)                { return "%f"; }
+            else if constexpr (std::is_same_v<U, double>)               { return "%lf"; }
+            else if constexpr (std::is_same_v<U, const char*>)          { return "\"%s\""; }
+            else if constexpr (std::is_same_v<U, std::string_view>)     { return "\"%s\""; }
+            else                                                        { return "%p"; }
         }
 
         template <class T>
@@ -281,38 +292,41 @@ namespace picolog
         void print_array(std::FILE* stream, const char* expr_str, const T& array, std::size_t n_elems, std::size_t focus_index)
         {
 
-            std::size_t from = 0;
-            std::size_t to = n_elems;
+            std::size_t from_index = 0;
+            std::size_t to_index = n_elems;
 
             if (n_elems > detail::config.max_array_elements())
             {
-                std::size_t half = detail::config.max_array_elements() / 2;
+                const std::size_t half = detail::config.max_array_elements() / 2;
                 if (focus_index < half) {
-                    from = 0;
-                    to = detail::config.max_array_elements();
+                    from_index = 0;
+                    to_index = detail::config.max_array_elements();
                 } else if (focus_index >= n_elems - half) {
-                    from = n_elems - detail::config.max_array_elements();
-                    to = n_elems;
+                    from_index = n_elems - detail::config.max_array_elements();
+                    to_index = n_elems;
                 } else {
-                    from = focus_index - half;
-                    to = focus_index + half;
+                    from_index = focus_index - half;
+                    to_index = focus_index + half;
                 }
             }
 
-            std::fprintf(stream, "  %s[%zu..%zu]: [", expr_str, from, to - 1);
-            for (auto i = from; i < to; ++i)
+           (void)std::fprintf(stream, "  %s[%zu..%zu]: [", expr_str, from_index, to_index - 1);
+            for (auto i = from_index; i < to_index; ++i)
             {
-                if (i > from) std::fprintf(stream, ", ");
+                if (i > from_index) 
+                {
+                   (void)std::fprintf(stream, ", ");
+                }
                 if constexpr (std::is_same_v<array_element_t<T>, bool>) 
                 {
-                    std::fprintf(stream, "%s", array[i] ? "true" : "false");
+                   (void)std::fprintf(stream, "%s", array[i] ? "true" : "false");
                 }
                 else 
                 {    
-                    std::fprintf(stream, format_for_type<array_element_t<T>>(), array[i]);
+                   (void)std::fprintf(stream, format_for_type<array_element_t<T>>(), array[i]);
                 }
             }
-            std::fprintf(stream, "]\n");
+           (void)std::fprintf(stream, "]\n");
         }
 
         // Notice that the return types differ, depending on the host platform.
@@ -372,12 +386,12 @@ namespace picolog
         template <typename T>
         void log_var(const expr<T>& value)
         {
-            std::fprintf(detail::config.output_stream(), detail::format_for_var<decltype(value.value)>(), value.str, value.value);
+           (void)std::fprintf(detail::config.output_stream(), detail::format_for_var<decltype(value.value)>(), value.str, value.value);
         }
 
         inline void log_var(const exp_message& message)
         {
-            std::fprintf(detail::config.output_stream(), "  %s\n", message.str);
+           (void)std::fprintf(detail::config.output_stream(), "  %s\n", message.str);
         }
 
         template <typename T>
@@ -403,25 +417,25 @@ namespace picolog
         switch(detail::config.print_flags_func())
         {
             case detail::print_flag_t::ts:
-                std::fprintf(detail::config.output_stream(), "[%lu ms]", detail::current_timestamp_ms());
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms]", detail::current_timestamp_ms());
                 break;
             case detail::print_flag_t::loc:
-                std::fprintf(detail::config.output_stream(), "(at %s:%d)", detail::remove_source_root(file).data(), line);
+               (void)std::fprintf(detail::config.output_stream(), "(at %s:%d)", detail::remove_source_root(file).data(), line);
                 break;
             case detail::print_flag_t::fun:
-                std::fprintf(detail::config.output_stream(), "ENTER @%s", function);
+               (void)std::fprintf(detail::config.output_stream(), "ENTER @%s", function);
                 break;
             case detail::print_flag_t::ts_loc:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d)", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d)", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line);
                 break;
             case detail::print_flag_t::ts_fun:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] ENTER @%s", detail::current_timestamp_ms(), function);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] ENTER @%s", detail::current_timestamp_ms(), function);
                 break;
             case detail::print_flag_t::loc_fun:
-                std::fprintf(detail::config.output_stream(), "(at %s:%d) ENTER @%s", detail::remove_source_root(file).data(), line, function);
+               (void)std::fprintf(detail::config.output_stream(), "(at %s:%d) ENTER @%s", detail::remove_source_root(file).data(), line, function);
                 break;
             case detail::print_flag_t::all:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d) ENTER @%s", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line, function);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d) ENTER @%s", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line, function);
                 break;
             default:
                 break;
@@ -430,14 +444,14 @@ namespace picolog
 
         if (format != nullptr)
         {
-            fputs(": ", detail::config.output_stream());
+            (void)std::fputs(": ", detail::config.output_stream());
         
             #if defined(__GNUC__) || defined(__clang__)
             #pragma GCC diagnostic push
             #pragma GCC diagnostic ignored "-Wformat-security"
             #endif
 
-            std::fprintf(detail::config.output_stream(), format, std::forward<Args>(args)...);
+           (void)std::fprintf(detail::config.output_stream(), format, std::forward<Args>(args)...);
         
             #if defined(__GNUC__) || defined(__clang__)
             #pragma GCC diagnostic pop
@@ -446,7 +460,7 @@ namespace picolog
 
         if (format == nullptr || std::string_view{format}.back() != '\n')
         {
-            std::fprintf(detail::config.output_stream(), "\n");
+           (void)std::fprintf(detail::config.output_stream(), "\n");
         }
     }
 
@@ -462,25 +476,25 @@ namespace picolog
         switch(detail::config.print_flags_func())
         {
             case detail::print_flag_t::ts:
-                std::fprintf(detail::config.output_stream(), "[%lu ms]", detail::current_timestamp_ms());
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms]", detail::current_timestamp_ms());
                 break;
             case detail::print_flag_t::loc:
-                std::fprintf(detail::config.output_stream(), "(at %s:%d)", detail::remove_source_root(file).data(), line);
+               (void)std::fprintf(detail::config.output_stream(), "(at %s:%d)", detail::remove_source_root(file).data(), line);
                 break;
             case detail::print_flag_t::fun:
-                std::fprintf(detail::config.output_stream(), "EXIT @%s", function);
+               (void)std::fprintf(detail::config.output_stream(), "EXIT @%s", function);
                 break;
             case detail::print_flag_t::ts_loc:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d)", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d)", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line);
                 break;
             case detail::print_flag_t::ts_fun:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] EXIT @%s", detail::current_timestamp_ms(), function);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] EXIT @%s", detail::current_timestamp_ms(), function);
                 break;
             case detail::print_flag_t::loc_fun:
-                std::fprintf(detail::config.output_stream(), "(at %s:%d) EXIT @%s", detail::remove_source_root(file).data(), line, function);
+               (void)std::fprintf(detail::config.output_stream(), "(at %s:%d) EXIT @%s", detail::remove_source_root(file).data(), line, function);
                 break;
             case detail::print_flag_t::all:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d) EXIT @%s", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line, function);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d) EXIT @%s", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line, function);
                 break;
             default:
                 break;
@@ -489,14 +503,14 @@ namespace picolog
 
         if (format != nullptr)
         {
-            fputs(": ", detail::config.output_stream());
+            (void)std::fputs(": ", detail::config.output_stream());
         
             #if defined(__GNUC__) || defined(__clang__)
             #pragma GCC diagnostic push
             #pragma GCC diagnostic ignored "-Wformat-security"
             #endif
 
-            std::fprintf(detail::config.output_stream(), format, std::forward<Args>(args)...);
+           (void)std::fprintf(detail::config.output_stream(), format, std::forward<Args>(args)...);
         
             #if defined(__GNUC__) || defined(__clang__)
             #pragma GCC diagnostic pop
@@ -506,7 +520,7 @@ namespace picolog
 
         if (format == nullptr || std::string_view{format}.back() != '\n')
         {
-            std::fprintf(detail::config.output_stream(), "\n");
+           (void)std::fprintf(detail::config.output_stream(), "\n");
         }
     }
 
@@ -521,34 +535,34 @@ namespace picolog
         switch(detail::config.print_flags_vars())
         {
             case detail::print_flag_t::ts:
-                std::fprintf(detail::config.output_stream(), "[%lu ms]", detail::current_timestamp_ms());
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms]", detail::current_timestamp_ms());
                 break;
             case detail::print_flag_t::loc:
-                std::fprintf(detail::config.output_stream(), "(at %s:%d)", detail::remove_source_root(file).data(), line);
+               (void)std::fprintf(detail::config.output_stream(), "(at %s:%d)", detail::remove_source_root(file).data(), line);
                 break;
             case detail::print_flag_t::fun:
-                std::fprintf(detail::config.output_stream(), "IN @%s", function);
+               (void)std::fprintf(detail::config.output_stream(), "IN @%s", function);
                 break;
             case detail::print_flag_t::ts_loc:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d)", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d)", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line);
                 break;
             case detail::print_flag_t::ts_fun:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] IN @%s", detail::current_timestamp_ms(), function);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] IN @%s", detail::current_timestamp_ms(), function);
                 break;
             case detail::print_flag_t::loc_fun:
-                std::fprintf(detail::config.output_stream(), "(at %s:%d) IN @%s", detail::remove_source_root(file).data(), line, function);
+               (void)std::fprintf(detail::config.output_stream(), "(at %s:%d) IN @%s", detail::remove_source_root(file).data(), line, function);
                 break;
             case detail::print_flag_t::all:
-                std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d) IN @%s", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line, function);
+               (void)std::fprintf(detail::config.output_stream(), "[%lu ms] (at %s:%d) IN @%s", detail::current_timestamp_ms(), detail::remove_source_root(file).data(), line, function);
                 break;
             default:
                 break;
         }
         if constexpr (sizeof...(args) > 0)
         {
-            fprintf(detail::config.output_stream(), detail::config.print_flags_vars() == detail::print_flag_t::none ? "{\n" : ":\n{\n");
+           (void)std::fprintf(detail::config.output_stream(), detail::config.print_flags_vars() == detail::print_flag_t::none ? "{\n" : ":\n{\n");
             (detail::log_var(args), ...);
-            fprintf(detail::config.output_stream(), "}\n");
+           (void)std::fprintf(detail::config.output_stream(), "}\n");
         }
     }
 
@@ -649,7 +663,8 @@ namespace picolog
     picolog::log_vars(__FILE__, __LINE__, __func__, MK_EXPR(exp1), MK_EXPR(exp2), MK_EXPR(exp3), MK_EXPR(exp4), MK_EXPR(exp5), MK_EXPR(exp6), MK_EXPR(exp7), MK_EXPR(exp8), MK_EXPR(exp9), MK_EXPR(exp10))
 
 
-
+// cppcheck-suppress-end [functionStatic, useStlAlgorithm, uninitMemberVar]
+// NOLINTEND
 
 #endif /* INCLUDED_PICOLOG_PICOLOG_HPP */
 
@@ -661,6 +676,12 @@ namespace picolog
 
 #ifndef INCLUDED_PICOLOG_PICOLOG_HPP
 #define INCLUDED_PICOLOG_PICOLOG_HPP
+
+// The line below disables clang-tidy checks for this file
+// NOLINTBEGIN
+
+// This line disables specific cppcheck warnings for this file
+// cppcheck-suppress-begin [functionStatic, useStlAlgorithm, uninitMemberVar]
 
 namespace picolog
 {
@@ -712,6 +733,9 @@ namespace picolog
 #define PICOLOG_SET_MAX_ARRAY_ELEMENTS(n) ((void)0)
 #define PICOLOG_SET_PRINT_CFG_FUNC(...) ((void)0)
 #define PICOLOG_SET_PRINT_CFG_VARS(...) ((void)0)
+
+// cppcheck-suppress-end [functionStatic, useStlAlgorithm, uninitMemberVar]
+// NOLINTEND
 
 #endif /* INCLUDED_PICOLOG_PICOLOG_HPP */
 
